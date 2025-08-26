@@ -240,9 +240,11 @@ class ExternalProblemsService {
             }
 
             if (topics && topics.length > 0) {
-                const topicConditions = topics.map(() => 'topic_tags LIKE ?');
-                conditions.push(`(${topicConditions.join(' OR ')})`);
-                topics.forEach(topic => params.push(`%${topic}%`));
+                // Create JSON array pattern for each topic
+                const topicConditions = topics.map(() => 'JSON_EXTRACT(topic_tags, "$") LIKE ?');
+                conditions.push(`(${topicConditions.join(' OR ')})`);                topics.forEach(topic => params.push(`%"${topic}"%`));
+                console.log('Topic filter conditions:', topicConditions);
+                console.log('Topic filter params:', params);
             }
 
             if (search) {

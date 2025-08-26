@@ -203,8 +203,19 @@ const ProblemDetail: React.FC = () => {
       const runResult = await runResponse.json();
       
       if (runResult.success) {
-        setRawOutput(runResult.output || 'Code executed successfully but no output');
-        console.log('Raw output:', runResult.output);
+        // Handle different types of output
+        let outputText = '';
+        if (runResult.error) {
+          outputText = `Error: ${runResult.error}`;
+        } else if (runResult.compile_output) {
+          outputText = `Compilation Error:\n${runResult.compile_output}`;
+        } else if (runResult.stderr) {
+          outputText = `Runtime Error:\n${runResult.stderr}`;
+        } else {
+          outputText = runResult.output || 'No output';
+        }
+        setRawOutput(outputText);
+        console.log('Raw output:', outputText);
       } else {
         setRawOutput(`Error: ${runResult.error || 'Unknown error'}`);
         console.log('Run error:', runResult.error);

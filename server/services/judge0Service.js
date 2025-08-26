@@ -166,7 +166,36 @@ class Judge0Service {
             const result = await this.waitForSubmission(token, 15000);
             console.log('Execution result:', result);
             
-            return result;
+            // Handle different output scenarios
+            if (result.status?.id === 3) { // Accepted
+                return {
+                    ...result,
+                    stdout: result.stdout || 'No output',
+                    stderr: result.stderr || '',
+                    compile_output: result.compile_output || ''
+                };
+            } else if (result.status?.id === 6) { // Compilation Error
+                return {
+                    ...result,
+                    stdout: '',
+                    stderr: '',
+                    compile_output: result.compile_output || 'Compilation Error'
+                };
+            } else if (result.status?.id === 5) { // Time Limit Exceeded
+                return {
+                    ...result,
+                    stdout: '',
+                    stderr: 'Time Limit Exceeded',
+                    compile_output: ''
+                };
+            } else {
+                return {
+                    ...result,
+                    stdout: result.stdout || '',
+                    stderr: result.stderr || 'Runtime Error',
+                    compile_output: result.compile_output || ''
+                };
+            }
         } catch (error) {
             console.error('Error executing code:', error);
             throw error;
